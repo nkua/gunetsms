@@ -14,10 +14,12 @@
 namespace GunetSMS;
 
 class Receiver {
+    
     protected $mobile;
     protected $smsc;
     protected $text;
     protected $log_id = null;
+    protected $_request_id;
 
     /**
      * Getter for mobile number
@@ -66,6 +68,8 @@ class Receiver {
         if($request->getMethod() != 'incoming_sms_message') {
             throw new InvalidRequestException(); return false;
         }
+        
+        $this->_request_id = $request->getId();
 
         $ret = $request->getParams();
 
@@ -80,4 +84,37 @@ class Receiver {
         return;
     }
 
+
+    /**
+     * Send status response
+     *
+     * @param int $code;
+     * @param string $message;
+     */
+    public function status($code, $message = '')
+    {
+        $response = new \Zend_Json_Server_Response();
+        $response->setId($this->_request_id);
+        
+
+        // Note: for simplicity, I don't return a JSON-RPC error message for negative answers;
+        // I simply return the negative error code to the SMS Web Service.
+        
+        $response->setResult($code);
+        
+        /*
+        if($code < 0) {
+            $response->setError(
+                new \Zend_Json_Server_Error($message, -32000, $code)
+            );
+        } else {
+            $response->setResult($code);
+        }
+        */
+        // syslog(LOG_DEBUG, $response->toJson() );
+        
+        header("Content-type: application/json-rpc; charset=utf-8");
+        echo $response->toJson();
+        flush();
+    }
 }
