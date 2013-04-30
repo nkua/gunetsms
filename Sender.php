@@ -98,10 +98,8 @@ class Sender {
         if(!is_null($this->log_id)) {
             $request['log_id'] = $this->log_id;
         }
-        syslog(LOG_DEBUG, print_r($request, true));
 
         $url = $this->_config->host . $this->_config->uri;
-        syslog(LOG_DEBUG, print_r($url, true));
 
         try {
             $ret = $this->_jsonrpccall($url, $method, $request);

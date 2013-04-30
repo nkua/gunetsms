@@ -111,7 +111,6 @@ class Receiver {
             $response->setResult($code);
         }
         */
-        // syslog(LOG_DEBUG, $response->toJson() );
         
         header("Content-type: application/json-rpc; charset=utf-8");
         echo $response->toJson();
